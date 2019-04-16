@@ -1,0 +1,25 @@
+{
+  "name": "ng-todo-assistant",
+  "version": "0.0.0",
+  "description": "A todo-list assistance system",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start-*\"",
+    "start-server": "npm --prefix server start",
+    "start-client": "npm --prefix client start",
+    "test": "npm --prefix server test && npm --prefix client test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Perajit/ng-todo-assistant.git"
+  },
+  "author": "Perajit Pasupat",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Perajit/ng-todo-assistant/issues"
+  },
+  "homepage": "https://github.com/Perajit/ng-todo-assistant#readme",
+  "devDependencies": {
+    "concurrently": "^4.1.0"
+  }
+}
