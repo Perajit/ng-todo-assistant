@@ -1,15 +1,19 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
-import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { LoginPageComponent } from './components/pages/login-page/login-page.component';
-import { HomePageComponent } from './components/pages/home-page/home-page.component';
 import { AuthStateReducer } from './store/reducers/auth-state.reducer';
 import { AuthEffects } from './store/effects/auth.effects';
-import { HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+
+import { AppComponent } from './app.component';
+import { LoginPageComponent } from './components/pages/login-page/login-page.component';
+import { HomePageComponent } from './components/pages/home-page/home-page.component';
+
+// FIXME: To be removed after integration with Line api
 import { FakeLineLoginComponent } from './components/pages/fake-line-login/fake-line-login.component';
 
 @NgModule({
@@ -30,7 +34,13 @@ import { FakeLineLoginComponent } from './components/pages/fake-line-login/fake-
       AuthEffects
     ])
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

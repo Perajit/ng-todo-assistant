@@ -29,7 +29,6 @@ export class LoginPageComponent implements OnInit {
   private subscribeAuthState() {
     this.authState$.subscribe((authState) => {
       const { data, error, isWaiting } = authState;
-      console.log('*** authState', authState);
 
       if (data) {
         this.handleLoginSuccess();
@@ -39,7 +38,6 @@ export class LoginPageComponent implements OnInit {
       }
       else if (!isWaiting) {
         const { token } = this.route.snapshot.queryParams;
-        console.log('*** token', token);
 
         if (token) {
           this.store.dispatch(new AuthSetTokenAction(token));
