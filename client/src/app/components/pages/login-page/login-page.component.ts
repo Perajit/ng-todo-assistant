@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap, ActivatedRouteSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 import { AuthRedirectAction, AuthSetTokenAction } from 'src/app/store/actions/auth.actions';
 
@@ -50,7 +49,6 @@ export class LoginPageComponent implements OnInit {
   }
 
   private handleLoginSuccess() {
-    console.log('*** handle login success');
     this.router.navigate(['/']);
   }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { API_URL } from '../configs/endpoints';
@@ -10,38 +10,44 @@ export class AuthService {
   readonly AUTH_TOKEN_STORAGE_KEY = '__TDA_AUTH_TOKEN__';
   readonly AUTH_API_URL = `${API_URL}/auth`;
 
-  private _authToken: string;
+  private currentAuthToken: string;
 
   constructor(
-    private readonly http: HttpClient
+    private readonly http: HttpClient,
+    @Inject('Window') private window: Window
   ) { }
 
   get authToken() {
-    return this._authToken || this.getStoredAuthCode();
+    return this.currentAuthToken || this.getStoredAuthCode();
   }
 
   set authToken(authCode: string) {
     this.setStoredAuthCode(authCode);
-    this._authToken = authCode;
+    this.currentAuthToken = authCode;
   }
 
   redirect() {
     const redirectUrl = `${this.AUTH_API_URL}/redirect`;
-    window.location.href = redirectUrl;
+    this.window.location.href = redirectUrl;
   }
 
   verify() {
     const reqUrl = `${this.AUTH_API_URL}/verify?token=${this.authToken}`;
+
     return this.http.get(reqUrl);
   }
 
   private getStoredAuthCode() {
+    const sessionStorage = this.window.sessionStorage;
+
     return sessionStorage.getItem(this.AUTH_TOKEN_STORAGE_KEY);
   }
 
   private setStoredAuthCode(authToken: string) {
+    const sessionStorage = this.window.sessionStorage;
+
     if (authToken) {
-      sessionStorage.setItem(this.AUTH_TOKEN_STORAGE_KEY, JSON.stringify(authToken));
+      sessionStorage.setItem(this.AUTH_TOKEN_STORAGE_KEY, authToken);
     }
     else {
       sessionStorage.removeItem(this.AUTH_TOKEN_STORAGE_KEY);

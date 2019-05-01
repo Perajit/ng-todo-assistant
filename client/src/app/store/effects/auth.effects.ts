@@ -50,10 +50,9 @@ export class AuthEffects {
   verify$: Observable<Action> = this.action$.pipe(
     ofType(AUTH_VERIFY_REQUEST),
     mergeMap((action: AuthVerifyRequestAction) => {
-      return this.authService.verify()
+      return this.authService.verify();
     }),
     map((user) => {
-      console.log('*** user', user);
       return new AuthVerifySuccessAction(user);
     }),
     catchError((err, caught) => {

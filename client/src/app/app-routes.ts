@@ -7,7 +7,7 @@ import { HomePageComponent } from './components/pages/home-page/home-page.compon
 // FIXME: To be removed after integration with LINE api
 import { FakeLineLoginComponent } from './components/pages/fake-line-login/fake-line-login.component';
 
-export default <Routes> [
+export default [
   // FIXME: To be removed after integration with LINE api
   {
     path: 'fake-line-login',
@@ -31,4 +31,4 @@ export default <Routes> [
       }
     ]
   }
-];
+] as Routes;

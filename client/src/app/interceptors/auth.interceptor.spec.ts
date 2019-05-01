@@ -6,7 +6,7 @@ import { AuthInterceptor } from './auth.interceptor';
 import { AuthService } from '../services/auth.service';
 
 describe('AuthInterceptor', () => {
-  const fakeAuthToken = 'fake-auth-token';
+  const authTokenMock = 'fake-auth-token';
 
   let httpMock: HttpTestingController;
   let service: AuthService;
@@ -16,6 +16,10 @@ describe('AuthInterceptor', () => {
       imports: [HttpClientTestingModule],
       providers: [
         AuthService,
+        {
+          provide: 'Window',
+          useValue: Window
+        },
         {
           provide: HTTP_INTERCEPTORS,
           useClass: AuthInterceptor,
@@ -28,19 +32,19 @@ describe('AuthInterceptor', () => {
   beforeEach(() => {
     httpMock = TestBed.get(HttpTestingController);
     service = TestBed.get(AuthService);
-    spyOnProperty(service, 'authToken').and.returnValue(fakeAuthToken);
+
+    spyOnProperty(service, 'authToken').and.returnValue(authTokenMock);
   });
 
   it('should set Authorization header', () => {
-    service.verify().subscribe((res) => {
-      expect(res).toBeTruthy();
-    });
+    service.verify().subscribe(() => {});
 
-    const reqUrl = (`${service.AUTH_API_URL}/verify?token=${fakeAuthToken}`);
+    const reqUrl = `${service.AUTH_API_URL}/verify?token=${authTokenMock}`;
     const httpReq = httpMock.expectOne(reqUrl);
 
     const actualAuthHeader = httpReq.request.headers.get('Authorization');
-    const expectedAuthHeader = `Bearer ${fakeAuthToken}`;
-    expect(actualAuthHeader).toBeTruthy(expectedAuthHeader);
+    const expectedAuthHeader = `Bearer ${authTokenMock}`;
+
+    expect(actualAuthHeader).toBe(expectedAuthHeader);
   });
 });

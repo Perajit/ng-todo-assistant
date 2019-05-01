@@ -36,6 +36,10 @@ import { FakeLineLoginComponent } from './components/pages/fake-line-login/fake-
   ],
   providers: [
     {
+      provide: 'Window',
+      useValue: window
+    },
+    {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true

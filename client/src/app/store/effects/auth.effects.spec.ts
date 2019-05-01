@@ -7,6 +7,7 @@ import { AuthEffects } from './auth.effects';
 import { AuthService } from 'src/app/services/auth.service';
 
 describe('AuthEffects', () => {
+  /* tslint:disable prefer-const */
   let actions$: Observable<any>;
 
   beforeEach(() => TestBed.configureTestingModule({
