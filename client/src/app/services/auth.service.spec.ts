@@ -45,7 +45,6 @@ describe('AuthService', () => {
   });
 
   describe('authToken', () => {
-
     describe('get', () => {
       it('should return latest set value', () => {
         service.authToken = authTokenMock;
@@ -89,17 +88,26 @@ describe('AuthService', () => {
   });
 
   describe('verify()', () => {
+    const userMock = {
+      name: 'Fake Name'
+    };
+
     beforeEach(() => {
       spyOnProperty(service, 'authToken').and.returnValue(authTokenMock);
     });
 
     it('should sent GET request to verify token', () => {
-      service.verify().subscribe(() => { });
+      service.verify().subscribe((user) => {
+        expect(user).toEqual(userMock);
+      });
 
       const expectedReqUrl = `${service.AUTH_API_URL}/verify?token=${authTokenMock}`;
       const httpReq = httpMock.expectOne(expectedReqUrl);
 
       expect(httpReq.request.method).toBe('GET');
+
+      httpReq.flush(userMock);
+      httpMock.verify();
     });
   });
 });

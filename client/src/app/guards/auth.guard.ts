@@ -8,13 +8,13 @@ import { map, take, tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  authState$: Observable<any>; // TODO: Handle typing
+  private authState$: Observable<any>; // TODO: Handle typing
 
   constructor(
     private readonly router: Router,
     private readonly store: Store<any> // TODO: Handle typing
   ) {
-    this.authState$ = store.select('authState');
+    this.authState$ = this.store.select('authState');
   }
 
   canActivate(route: ActivatedRouteSnapshot) {
