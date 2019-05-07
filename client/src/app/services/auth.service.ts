@@ -1,7 +1,9 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 import { API_URL } from '../configs/endpoints';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +16,16 @@ export class AuthService {
 
   constructor(
     private readonly http: HttpClient,
-    @Inject('Window') private window: Window
+    @Inject('Window') private readonly window: Window
   ) { }
 
   get authToken() {
-    return this.currentAuthToken || this.getStoredAuthCode();
+    return this.currentAuthToken || this.getStoredAuthToken();
   }
 
-  set authToken(authCode: string) {
-    this.setStoredAuthCode(authCode);
-    this.currentAuthToken = authCode;
+  set authToken(authToken: string) {
+    this.setStoredAuthToken(authToken);
+    this.currentAuthToken = authToken;
   }
 
   redirect() {
@@ -31,19 +33,19 @@ export class AuthService {
     this.window.location.href = redirectUrl;
   }
 
-  verify() {
-    const reqUrl = `${this.AUTH_API_URL}/verify?token=${this.authToken}`;
+  verify(authToken) {
+    const reqUrl = `${this.AUTH_API_URL}/verify?token=${authToken}`;
 
-    return this.http.get(reqUrl);
+    return this.http.get(reqUrl) as Observable<User>;
   }
 
-  private getStoredAuthCode() {
+  private getStoredAuthToken() {
     const sessionStorage = this.window.sessionStorage;
 
     return sessionStorage.getItem(this.AUTH_TOKEN_STORAGE_KEY);
   }
 
-  private setStoredAuthCode(authToken: string) {
+  private setStoredAuthToken(authToken: string) {
     const sessionStorage = this.window.sessionStorage;
 
     if (authToken) {

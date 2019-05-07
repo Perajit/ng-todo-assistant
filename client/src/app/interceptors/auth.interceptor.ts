@@ -7,7 +7,7 @@ import { AuthService } from '../services/auth.service';
 export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private readonly authService: AuthService
-  ) {}
+  ) { }
 
   intercept(
     req: HttpRequest<any>,
@@ -27,7 +27,7 @@ export class AuthInterceptor implements HttpInterceptor {
     const authToken = this.authService.authToken;
 
     return req.clone({
-      setHeaders: { Authorization: `Bearer ${authToken}`}
+      setHeaders: { Authorization: `Bearer ${authToken}` }
     });
   }
 }

@@ -1,47 +1,46 @@
-import { TestBed, async, inject, ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { provideMockStore, MockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 
 import { AuthGuard } from './auth.guard';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
-
-interface IAuthState {
-  isLoading: boolean;
-  error: any;
-  data: any;
-}
+import { IAppStates, IAuthState } from '../store/states';
+import { LoginPageComponent } from '../components/pages/login-page/login-page.component';
 
 describe('AuthGuard', () => {
-  let guard: AuthGuard;
-  let store: MockStore<any>;
-  let router: Router;
-
   const initialAuthState: IAuthState = {
-    isLoading: false,
+    data: null,
     error: null,
-    data: null
+    isWaiting: false
   };
+
+  let guard: AuthGuard;
+  let router: Router;
+  let store: MockStore<IAppStates>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      declarations: [LoginPageComponent],
+      imports: [
+        RouterTestingModule.withRoutes([
+          { path: 'login', component: LoginPageComponent },
+        ])
+      ],
       providers: [
         AuthGuard,
         provideMockStore({
           initialState: { authState: initialAuthState }
         })
-      ],
-      imports: [
-        RouterTestingModule.withRoutes([])
       ]
     });
   });
 
   beforeEach(() => {
     guard = TestBed.get(AuthGuard);
-    store = TestBed.get(Store);
     router = TestBed.get(Router);
+    store = TestBed.get(Store);
   });
 
   it('should be created', () => {
@@ -49,20 +48,20 @@ describe('AuthGuard', () => {
   });
 
   describe('canActivate()', () => {
-    const routeMock: any = {
-      queryParams: {
-        token: 'fake-auth-token'
-      }
-    };
-
     describe('when user is not logged in', () => {
+      const routeMock: any = {
+        queryParams: {
+          token: 'fake-auth-token'
+        }
+      };
+
       it('should return false', () => {
-        const expected = cold('(a|)', { a: false });
+        const expected = cold('(a)', { a: false });
 
         expect(guard.canActivate(routeMock)).toBeObservable(expected);
       });
 
-      it('should redirect to login page', () => {
+      it('should redirect to login page with current query params', () => {
         spyOn(router, 'navigate');
 
         guard.canActivate(routeMock).subscribe(() => {
@@ -75,21 +74,17 @@ describe('AuthGuard', () => {
     });
 
     describe('when user is logged in', () => {
-      const userMock = {
-        name: 'Fake Name'
-      };
+      const routeMock: any = {};
+      const userMock = { name: 'Fake Name' };
 
       beforeEach(() => {
         store.setState({
-          authState: {
-            ...initialAuthState,
-            data: userMock
-          }
+          authState: { ...initialAuthState, data: userMock }
         });
       });
 
       it('should return true if user is logged in', () => {
-        const expected = cold('(a|)', { a: true });
+        const expected = cold('(a)', { a: true });
 
         expect(guard.canActivate(routeMock)).toBeObservable(expected);
       });

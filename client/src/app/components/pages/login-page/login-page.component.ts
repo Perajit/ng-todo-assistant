@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap, ActivatedRouteSnapshot } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { AuthRedirectAction, AuthSetTokenAction } from 'src/app/store/actions/auth.actions';
+import { AuthRedirectAction, AuthVerifyRequestAction } from 'src/app/store/actions/auth.actions';
+import { IAuthState } from 'src/app/store/states';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-login-page',
@@ -11,12 +13,12 @@ import { AuthRedirectAction, AuthSetTokenAction } from 'src/app/store/actions/au
   styleUrls: ['./login-page.component.css']
 })
 export class LoginPageComponent implements OnInit {
-  authState$: Observable<any>; // TODO: Handle typing
+  private authState$: Observable<IAuthState>;
 
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly store: Store<any> // TODO: Handle typing
+    private readonly store: Store<IAuthState>
   ) {
     this.authState$ = store.select('authState');
   }
@@ -39,7 +41,7 @@ export class LoginPageComponent implements OnInit {
         const { token } = this.route.snapshot.queryParams;
 
         if (token) {
-          this.store.dispatch(new AuthSetTokenAction(token));
+          this.store.dispatch(new AuthVerifyRequestAction(token));
         }
         else {
           this.store.dispatch(new AuthRedirectAction());

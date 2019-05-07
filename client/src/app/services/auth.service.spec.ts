@@ -77,7 +77,7 @@ describe('AuthService', () => {
   });
 
   describe('redirect()', () => {
-    it('should redirect to auth endpoint', () => {
+    it('should redirect to auth-redirect endpoint', () => {
       service.redirect();
 
       const actualLocation = windowMock.location.href;
@@ -92,12 +92,8 @@ describe('AuthService', () => {
       name: 'Fake Name'
     };
 
-    beforeEach(() => {
-      spyOnProperty(service, 'authToken').and.returnValue(authTokenMock);
-    });
-
     it('should sent GET request to verify token', () => {
-      service.verify().subscribe((user) => {
+      service.verify(authTokenMock).subscribe((user) => {
         expect(user).toEqual(userMock);
       });
 

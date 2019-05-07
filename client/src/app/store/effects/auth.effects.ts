@@ -1,20 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { mergeMap, map, tap, catchError, take } from 'rxjs/operators';
+import { mergeMap, map, take, tap, catchError } from 'rxjs/operators';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions, ofType } from '@ngrx/effects';
 
 import { AuthService } from 'src/app/services/auth.service';
 import {
-  AuthRedirectAction,
-  AuthSetTokenAction,
   AuthVerifyRequestAction,
   AuthVerifySuccessAction,
   AuthVerifyFailureAction
 } from '../actions/auth.actions';
 import {
   AUTH_REDIRECT,
-  AUTH_SET_TOKEN,
   AUTH_VERIFY_REQUEST
 } from '../action-types/auth-action-types';
 
@@ -32,25 +29,20 @@ export class AuthEffects {
   redirect$: Observable<Action> = this.action$.pipe(
     ofType(AUTH_REDIRECT),
     take(1),
-    tap((action: AuthRedirectAction) => {
-      return this.authService.redirect();
+    tap(() => {
+      this.authService.redirect();
     })
-  );
-
-  @Effect()
-  setToken$: Observable<Action> = this.action$.pipe(
-    ofType(AUTH_SET_TOKEN),
-    tap((action: AuthSetTokenAction) => {
-      this.authService.authToken = action.payload;
-    }),
-    map(() => new AuthVerifyRequestAction())
   );
 
   @Effect()
   verify$: Observable<Action> = this.action$.pipe(
     ofType(AUTH_VERIFY_REQUEST),
     mergeMap((action: AuthVerifyRequestAction) => {
-      return this.authService.verify();
+      const authToken = action.payload;
+
+      return this.authService.verify(authToken).pipe(
+        tap(() => this.authService.authToken = authToken)
+      );
     }),
     map((user) => {
       return new AuthVerifySuccessAction(user);

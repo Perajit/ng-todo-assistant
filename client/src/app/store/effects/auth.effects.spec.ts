@@ -31,4 +31,16 @@ describe('AuthEffects', () => {
     const service: AuthEffects = TestBed.get(AuthEffects);
     expect(service).toBeTruthy();
   });
+
+  describe('redirect$', () => {
+    it('should redirect to login provider', () => {
+      // TODO: Add test logic
+    });
+  });
+
+  describe('verify$', () => {
+    it('should send request to verify token', () => {
+      // TODO: Add test logic
+    });
+  });
 });

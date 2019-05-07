@@ -1,14 +1,16 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 
 import { AuthInterceptor } from './auth.interceptor';
 import { AuthService } from '../services/auth.service';
+import { API_URL } from '../configs/endpoints';
 
 describe('AuthInterceptor', () => {
   const authTokenMock = 'fake-auth-token';
 
   let httpMock: HttpTestingController;
+  let http: HttpClient;
   let service: AuthService;
 
   beforeEach(() => {
@@ -31,20 +33,23 @@ describe('AuthInterceptor', () => {
 
   beforeEach(() => {
     httpMock = TestBed.get(HttpTestingController);
+    http = TestBed.get(HttpClient);
     service = TestBed.get(AuthService);
 
     spyOnProperty(service, 'authToken').and.returnValue(authTokenMock);
   });
 
-  it('should set Authorization header', () => {
-    service.verify().subscribe(() => {});
+  it('should set Authorization header', fakeAsync(() => {
+    const reqUrl = `${API_URL}/path`;
 
-    const reqUrl = `${service.AUTH_API_URL}/verify?token=${authTokenMock}`;
-    const httpReq = httpMock.expectOne(reqUrl);
+    http.get(reqUrl).toPromise();
 
+    tick();
+
+    const httpReq = httpMock.expectOne(reqUrl)
     const actualAuthHeader = httpReq.request.headers.get('Authorization');
     const expectedAuthHeader = `Bearer ${authTokenMock}`;
 
     expect(actualAuthHeader).toBe(expectedAuthHeader);
-  });
+  }))
 });
