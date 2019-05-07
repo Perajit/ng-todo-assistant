@@ -1,14 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 import { Store, StoreModule } from '@ngrx/store';
 import { provideMockActions } from '@ngrx/effects/testing';
-import { Observable } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 
 import { AuthEffects } from './auth.effects';
 import { AuthService } from 'src/app/services/auth.service';
+import { AuthRedirectAction, AuthVerifyRequestAction, AuthVerifySuccessAction, AuthVerifyFailureAction } from '../actions/auth.actions';
 
 describe('AuthEffects', () => {
-  /* tslint:disable prefer-const */
-  let actions$: Observable<any>;
+  const authServiceMock = {
+    authToken: null,
+    redirect: jasmine.createSpy(),
+    verify: jasmine.createSpy()
+  };
+
+  let effects: AuthEffects;
+  let actions: ReplaySubject<any>;
 
   beforeEach(() => TestBed.configureTestingModule({
     imports: [
@@ -16,31 +23,88 @@ describe('AuthEffects', () => {
     ],
     providers: [
       Store,
-      provideMockActions(() => actions$),
+      provideMockActions(() => actions),
       {
         provide: AuthService,
-        useValue: jasmine.createSpyObj('authService', [
-          'redirect',
-          'verify'
-        ])
+        useFactory: (() => authServiceMock)
       }
     ]
   }));
 
+  beforeEach(() => {
+    effects = TestBed.get(AuthEffects);
+  });
+
   it('should be created', () => {
-    const service: AuthEffects = TestBed.get(AuthEffects);
-    expect(service).toBeTruthy();
+    expect(effects).toBeTruthy();
   });
 
   describe('redirect$', () => {
-    it('should redirect to login provider', () => {
-      // TODO: Add test logic
+    it('should call auth redirect service', () => {
+      const action = new AuthRedirectAction();
+
+      actions = new ReplaySubject(1);
+      actions.next(action);
+
+      effects.redirect$.subscribe(() => {
+        expect(authServiceMock.redirect).toHaveBeenCalled();
+      });
     });
   });
 
   describe('verify$', () => {
-    it('should send request to verify token', () => {
-      // TODO: Add test logic
+    const authTokenMock = 'fake-auth-token';
+    const errorMessageMock = 'Fake Error';
+    const action = new AuthVerifyRequestAction(authTokenMock);
+
+    it('should call auth verify service', () => {
+      actions = new ReplaySubject(1);
+      actions.next(action);
+
+      effects.redirect$.subscribe(() => {
+        expect(authServiceMock.verify).toHaveBeenCalledWith(authTokenMock);
+      });
+    });
+
+    describe('when request succeeds', () => {
+      const userMock = { name: 'Fake Name' };
+
+      beforeEach(() => {
+        authServiceMock.verify.and.returnValue(userMock);
+      });
+
+      it('should dispatch AuthVerifySuccessAction', () => {
+        actions = new ReplaySubject(1);
+        actions.next(action);
+
+        effects.redirect$.subscribe((actualNextAction) => {
+          const expectedNextAction = new AuthVerifySuccessAction(userMock);
+          expect(actualNextAction).toEqual(expectedNextAction);
+        });
+      });
+
+      it('should set auth token', () => {
+        actions = new ReplaySubject(1);
+        actions.next(action);
+
+        effects.redirect$.subscribe(() => {
+          expect(authServiceMock.authToken).toHaveBeenCalledWith(authTokenMock);
+        });
+      });
+    });
+
+    describe('when request fails', () => {
+      it('should dispatch AuthVerifyFailureAction', () => {
+        authServiceMock.verify.and.throwError(errorMessageMock);
+
+        actions = new ReplaySubject(1);
+        actions.next(action);
+
+        effects.redirect$.subscribe((actualNextAction) => {
+          const expectedNextAction = new AuthVerifyFailureAction(errorMessageMock);
+          expect(actualNextAction).toEqual(expectedNextAction);
+        });
+      });
     });
   });
 });

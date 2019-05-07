@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, async } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 
@@ -46,10 +46,10 @@ describe('AuthInterceptor', () => {
 
     tick();
 
-    const httpReq = httpMock.expectOne(reqUrl)
+    const httpReq = httpMock.expectOne(reqUrl);
     const actualAuthHeader = httpReq.request.headers.get('Authorization');
     const expectedAuthHeader = `Bearer ${authTokenMock}`;
 
     expect(actualAuthHeader).toBe(expectedAuthHeader);
-  }))
+  }));
 });

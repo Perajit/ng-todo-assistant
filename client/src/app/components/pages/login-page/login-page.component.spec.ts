@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
 import { LoginPageComponent } from './login-page.component';
 import { AuthService } from 'src/app/services/auth.service';
@@ -70,7 +70,8 @@ describe('LoginPageComponent', () => {
 
   describe('when not having token as query param', () => {
     it('should dispatch AuthRedirectAction', () => {
-      expect(dispatch).toHaveBeenCalledWith(new AuthRedirectAction());
+      const expectedAction = new AuthRedirectAction();
+      expect(dispatch).toHaveBeenCalledWith(expectedAction);
     });
   });
 
@@ -83,11 +84,12 @@ describe('LoginPageComponent', () => {
         authState: { isWaiting: false, data: null, error: null }
       });
 
-      expect(dispatch).toHaveBeenCalledWith(new AuthVerifyRequestAction(tokenMock));
+      const expectedAction = new AuthVerifyRequestAction(tokenMock);
+      expect(dispatch).toHaveBeenCalledWith(expectedAction);
     });
   });
 
-  describe('when user successfully log in', () => {
+  describe('when user is logged in', () => {
     it('should redirect to landing page', () => {
       const userMock = { name: 'Fake Name' };
 

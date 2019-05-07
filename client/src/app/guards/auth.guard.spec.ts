@@ -83,7 +83,7 @@ describe('AuthGuard', () => {
         });
       });
 
-      it('should return true if user is logged in', () => {
+      it('should return true', () => {
         const expected = cold('(a)', { a: true });
 
         expect(guard.canActivate(routeMock)).toBeObservable(expected);
